@@ -22,7 +22,6 @@ def user(request):
         password = request.POST.get('password')
         
         try:
-           
             auth_response = supabase.auth.sign_up({
                 "email": email,
                 "password": password,
@@ -31,19 +30,21 @@ def user(request):
             if auth_response.user:
                 user_data = auth_response.user  
                 user_id = user_data.id
-                place_id = request.POST.get('sel_place')
                 photo = request.FILES.get('photo')
 
-              
-                try:
-                    file_name = f"UserDocs/{user_id}_{uuid.uuid4()}_{photo.name}"
-                    photo_content = photo.read()
-                    storage_response = supabase.storage.from_("Shoppify").upload(file_name, photo_content)
-                    photo_url = supabase.storage.from_("Shoppify").get_public_url(file_name)
-                except Exception as e:
-                    return render(request, "Guest/User.html", {"district": dis, "error": "Failed to upload photo."})
-
-               
+                if photo:
+                    try:
+                        # File name uses only user_id and the original photo name
+                        file_name = f"UserDocs/{user_id}_{photo.name}"
+                        photo_content = photo.read()
+                        storage_response = supabase.storage.from_("Shoppify").upload(file_name, photo_content)
+                        photo_url = supabase.storage.from_("Shoppify").get_public_url(file_name)
+                    except Exception as e:
+                        return render(request, "Guest/User.html", {"district": dis, "error": "Failed to upload photo."})
+                else:
+                    photo_url = None  # Handle cases where no photo is uploaded
+                
+                # Save user details in the database
                 tbl_user.objects.create(
                     user_id=user_id,
                     user_name=request.POST.get('name'),
@@ -52,19 +53,18 @@ def user(request):
                     user_address=request.POST.get('address'),
                     user_contact=request.POST.get('contact'),
                     user_photo=photo_url,
-                    place=tbl_place.objects.get(id=place_id)
+                    place=tbl_place.objects.get(id=request.POST.get('sel_place'))
                 )
                 
-              
                 return redirect('Guest:login')
             else:
                 return render(request, "Guest/User.html", {"district": dis, "error": "Sign-up failed."})
 
         except Exception as e:
             return render(request, "Guest/User.html", {"district": dis, "error": "An error occurred during sign-up."})
-
     
     return render(request, "Guest/User.html", {"district": dis})
+
 
 
 

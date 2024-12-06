@@ -1,16 +1,17 @@
 from django.db import models
 from Admin.models import *
-# Create your models here.
+import uuid
 
 class tbl_user(models.Model):
-    user_id = models.CharField(primary_key=True)
+    user_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)  
     user_name = models.CharField(max_length=50, unique=True)
     user_email = models.EmailField(unique=True)
     user_password = models.CharField(max_length=255)
-    user_photo=models.URLField()
+    user_photo = models.URLField()
     user_contact = models.CharField(max_length=50)
     user_address = models.CharField(max_length=255)
-    place=models.ForeignKey(tbl_place,on_delete=models.CASCADE) 
+    place = models.ForeignKey(tbl_place, on_delete=models.CASCADE)
+
 
 class tbl_shop(models.Model):
     shop_id = models.CharField(primary_key=True)
