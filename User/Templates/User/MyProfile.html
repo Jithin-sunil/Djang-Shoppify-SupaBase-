@@ -25,7 +25,17 @@
                 <td>Contact</td>
                 <td>{{user.user_contact}}</td>
             </tr>
+            <tr>
+                <td>
+                    <a href="{% url 'User:change_password' %}">Change password</a>
+                </td>
+            </tr>
         </table>
     </form>
 </body>
 </html>
+{% if message %}
+<script>
+    alert("{{ message }}"); 
+</script>
+{% endif %}

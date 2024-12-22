@@ -1,9 +1,9 @@
 from django.db import models
 from Admin.models import *
-import uuid
+
 
 class tbl_user(models.Model):
-    user_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)  
+    user_id = models.TextField(primary_key=True,  editable=False)  
     user_name = models.CharField(max_length=50, unique=True)
     user_email = models.EmailField(unique=True)
     user_password = models.CharField(max_length=255)
